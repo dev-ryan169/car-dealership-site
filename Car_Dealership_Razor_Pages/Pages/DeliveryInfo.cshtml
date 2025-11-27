@@ -1,0 +1,173 @@
+﻿@page
+@model Car_Dealership_Razor_Pages.Pages.DeliveryInfoModel
+@{
+    ViewData["Title"] = "Delivery Information";
+}
+
+<h1>Premium Deluxe Motorsport by dev-ryan169</h1>
+<h1>Delivery Information Collection</h1>
+<i style="color: red"><div asp-validation-summary="All"></div></i>
+<form method="post">
+    <p>
+        Name: <input type="text" asp-for="Name" />
+        &nbsp;
+        Contact Number: <input type="text" asp-for="ContactNo" />
+    </p>
+    <p>
+        Preferred Delivery Courier:
+        <select asp-for="Courier">
+            @foreach (var m in Model.CourierList)
+            {
+                <option value=@m> @m </option>
+            }
+        </select>
+        Delivery Grade:
+        <select asp-for="ShippingOption">
+            @foreach (var n in Model.ShippingOptionList)
+            {
+                <option value=@n> @n </option>
+            }
+        </select>
+    </p>
+    <p>
+        @{
+            //Calling this removes all Sundays from the drop down list
+            bool FindDay(int day)
+            {
+                foreach (int d in Model.Sundays)
+                {
+                    if (d == day)
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        }
+
+        Select Day:
+        <select asp-for="DeliveryDate">
+            @for (int i = 1; i <= 31; i++)
+            {
+                if (FindDay(i))
+                {
+                    <option value=@i>@(i.ToString() + " Mar 2023")</option>
+                }
+            }
+        </select>
+    </p>
+    <p>
+        
+        Preferred Delivery Slot (or Slots):
+        @foreach (string m in Model.TimingList)
+        {
+            //diplay checkboxes for delivery slots
+            <br />
+            <input name="AreChecked"
+                   type="checkbox"
+                   asp-for="DeliverySlot"
+                   value="@m" /> @m 
+        }
+        <br />
+        Notice: Slots will be allocated based on availability, if not selected.
+    </p>
+    <p>
+        <input type="submit" value="OK" />
+    </p>
+    <p>
+        @Model.Prompt1
+    </p>
+    <p>
+        @{
+            //Check whether checkboxes are selected or not
+            bool FindTime(string m)
+            {
+                bool found = false;
+                if (Model.AreChecked == null)
+                    return false;
+                foreach (var a in Model.AreChecked)
+                {
+                    if (a == m)
+                        found = true;
+                }
+                return found;
+            }
+        }
+        @{
+            //This calculates cost according to preferences and return the value
+            float CalculateCost(string x, string y)
+            {
+                float TotalCost = 0.00f;
+                if (x == "Premium Deluxe Delivery")
+                {
+                    TotalCost += 5000.00f;
+                }
+                else if (x == "Cheap Stake Delivery")
+                {
+                    TotalCost += 500.00f;
+                }
+                else if (x == "X Delivery")
+                {
+                    TotalCost += 3500.00f;
+                }
+                else if (x == "McLaren Delivery")
+                {
+                    TotalCost += 10000.00f;
+                }
+                if (y == "Insured Shipping")
+                {
+                    TotalCost += (TotalCost * 0.10f);
+                }
+                else if (y == "Standard Shipping")
+                {
+                    TotalCost += 50.00f;
+                }
+                else if (y == "Fully Armoured and Armed Shipping")
+                {
+                    TotalCost += 100000.00f;
+                }
+                return TotalCost;
+            }
+        }
+        <table border="1" class="table-bordered" @Model.TableHidden >
+            <tr>
+                <td>Recipient Name</td>
+                <td>@Model.Name</td>
+            </tr
+            <tr>
+                <td>Contact Number</td>
+                <td>@Model.ContactNo</td>
+            </tr>
+            <tr>
+                <td>Courier</td>
+                <td>@Model.Courier</td>
+            </tr>
+            <tr>
+                <td>Delivery Grade</td>
+                <td>@Model.ShippingOption</td>
+            </tr>
+            <tr>
+                <td>Delivery Date</td>
+                <td>@(Model.DeliveryDate + " March 2023")</td>
+            </tr>
+            @for (int i = 0; i < Model.TimingList.Length; i++)
+            {
+                <tr>
+                    <td>@Model.TimingList[i]</td>
+                    @if (FindTime(Model.TimingList[i]) == true)
+                    {
+                        <td>Preferred</td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+                </tr>
+            }
+            <tr>
+                <td>Total Service Cost</td>
+                <td>@CalculateCost(@Model.Courier,Model.ShippingOption) USD</td>
+            </tr>
+    </p>
+</form>

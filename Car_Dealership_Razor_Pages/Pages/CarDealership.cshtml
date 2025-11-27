@@ -1,0 +1,85 @@
+﻿@page
+@model Car_Dealership_Razor_Pages.Pages.CarDealershipModel
+@{
+    ViewData["Title"] = "Premium Deluxe Motorsport";
+}
+
+<h1>Premium Deluxe Motorsport by dev-ryan169</h1>
+<h1 class="display-6">
+    @{
+        var WelcomeMessage = "Welcome to our checkout section!";
+    }
+    @WelcomeMessage
+</h1>
+<i style="color: red"><div asp-validation-summary="All"></div></i>
+<form method="post">
+    <p>
+        Customer Name: <input type="text" asp-for="CusName" />
+        Contact Number: <input type="text" asp-for="ContactNumber" />
+    </p>
+    <p>
+        Select Your Car: <br />
+        
+        <img src="BMW325i.JPG" alt="BMW325i" width="100" />
+        <input type="radio" asp-for="CarModel" value="BMW 325i" checked="checked" /> BMW 325i<br />
+
+        <img src="Mercedes-AMG.JPG" alt="Mercedes-AMG" width="100" />
+        <input type="radio" asp-for="CarModel" value="Mercedes-AMG A 35 4MATIC" /> Mercedes-AMG A 35 4MATIC<br />
+
+        <img src="McLarenP1.JPG" alt="McLarenP1" width="100" />
+        <input type="radio" asp-for="CarModel" value="McLaren P1 (Limited Edition)" /> McLaren P1 (Limited Edition)<br />
+    </p>
+    <p>
+        <table class="table">
+            <thead>
+                <tr><th>Optional Service Type</th><th>Price Tag</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><input type="checkbox" asp-for="ExtendedWarranty" /> Extended Warranty</td><td>+4000 USD</td></tr>
+                <tr><td><input type="checkbox" asp-for="FCInsurance" /> Full Coverage Insurance</td><td>+10% of Car Price</td></tr>
+                <tr><td><input type="checkbox" asp-for="SportPackage" /> Sport Package</td><td>+5700 USD</td></tr>
+            </tbody>
+        </table>
+    </p>
+    <p>
+        Delivery Method: <select asp-for="Delivery">
+            @foreach (var m in Model.DeliveryMethods)
+            {
+                <option value=@m> @m </option>
+            }
+        </select>
+    </p>
+    <p> Please select your preferred collection date, which is not less than 3 days from today.
+        <br />
+        Please ignore if you have opted for home delivery.
+    </p>
+    <p>
+        Collection datetime: <input type="date" asp-for="CollectionDate" asp-format="{0:yyyy-MM-dd}" /><br />
+        <i style="color: red">@Model.DateErrorPrompt</i>
+    </p>
+    <p>
+        <input type="submit" asp-page-handler="USD" value="Display Price in USD" />
+        <input type="submit" asp-page-handler="SGD" value="Display Price in SGD" />
+        <input type="submit" asp-page-handler="MYR" value="Display Price in MYR" />
+    </p>
+    <table class="table" @Model.HideTable>
+       <tbody>
+            <tr><td>Customer Info:</td><td>@Model.CustomerInfo</td></tr>
+            <tr><td>Delivery Option:</td><td>
+                    @if (Model.Delivery == "Self-Collection")
+                    {
+                        @(Model.Delivery + " on ")
+                        @Model.CollectionDate.ToString("MM/dd/yyyy")
+                    }
+                    else
+                    {
+                        @(Model.Delivery + ". Please proceed to fill out delivery information on \"")
+
+                            <a href="DeliveryInfo">Delivery Information Page</a>@(" \"")
+                    }
+                </td></tr>
+            <tr><td>Order Info:</td><td>@Model.OrderInfo</td></tr>
+            <tr><td>Total Cost:</td><td>@Model.CurrencySymbol@Model.TotalCost.ToString()</td></tr>
+       </tbody>
+    </table>
+</form>
